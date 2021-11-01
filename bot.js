@@ -17,7 +17,7 @@ const CONFIG = low(ADAPTER_CONFIG);
 const AUTO_SAVE = CONFIG.get('auto_save').value();
 
 if (AUTO_SAVE) {
-  cron.schedule('* */1 * * *', async () => {
+  cron.schedule('* * */5 * *', async () => {
     await saveData(CONFIG, DB);
   });
 }
