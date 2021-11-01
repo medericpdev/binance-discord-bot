@@ -11,7 +11,7 @@ const ADAPTER_CONFIG = new FILE_SYNC('config.json');
 const CONFIG = LOW(ADAPTER_CONFIG);
 
 async function handleCommands(message, prefix, client) {
-  if (message.channel.type === 'dm') {
+  if (message.channel.type === 'dm' && message.author.bot == false) {
     _handleAddPlayer(message);
     return;
   }
@@ -19,10 +19,10 @@ async function handleCommands(message, prefix, client) {
   message.channel = client.channels.cache.find(channel => channel.name === CONFIG.get('channel_name').value());
 
   if (message.content.search(`${prefix}addplayer`) == 0) {
-    message.author.send(":small_orange_diamond: To add a new player, send me a single message with the name, api key, secret api key, bet \n " +
-      ":small_orange_diamond: You can get your api key from your binance account (on binance api management, check only 'Enable Reading' and Unrestricted IP access) \n" +
+    message.author.send(":small_orange_diamond: To add a new player, send me a private message with the NAME, API KEY, SECRET API KEY, BET \n" +
+      ":small_orange_diamond: You can get your API key from your binance account (on binance API management, check only 'Enable Reading', 'Enable Futures' and 'Unrestricted IP access') \n" +
       ":small_orange_diamond: Example : \n" +
-      "**John XXXXXXX XXXXXXXXX 100**");
+      "**John XX XX 100**");
   }
 
   if (message.content.search(`${prefix}deleteplayer`) == 0)
@@ -45,12 +45,12 @@ function _handleAddPlayer(message) {
 
   if (ARG[0] == null || ARG[1] == null || ARG[2] == null | ARG[3] == null) {
     message.author.send("**:warning: Wrong format :warning:**").catch(err => { });
+    message.author.send("**:point_right: Try : addplayer 'player name'  'public key'  'secret key'  'player bet'**").catch(err => { });
     return;
   }
 
   if (!isNaN(ARG[3])) {
-
-    if (addPlayerInConfig({ PLAYER_NAME, PUBLIC_KEY, SECRET_KEY }, CONFIG)) {
+    if (addPlayerInConfig(PLAYER_NAME, PUBLIC_KEY, SECRET_KEY, PLAYER_BET, CONFIG)) {
       message.author.send(":white_check_mark: name : **" + PLAYER_NAME + "**\n" +
         ":white_check_mark: api_key : **" + PUBLIC_KEY + "**\n" +
         ":white_check_mark: secret_key : **" + SECRET_KEY + "**\n" +
@@ -58,7 +58,7 @@ function _handleAddPlayer(message) {
       ).catch(err => { });
     }
   } else
-    message.author.send("**:warning: You must use an integer :warning:**").catch(err => { });
+    message.author.send("**:warning: You must use a number for the player's bet :warning:**").catch(err => { });
 }
 
 function _handleDeletePlayer(message, prefix) {
@@ -118,19 +118,32 @@ async function _handlePlayerBalance(message, PLAYER_NAME) {
       getPnlHistory(message, PLAYER.name, PNL, DB);
 
   } catch (e) {
-    message.channel.send("**:warning: Error balance :warning:**");
+    message.channel.send("**:warning: Error balance, are the API keys valid? :warning:**");
   }
 }
 
 async function _handlePlayersBalance(message) {
-  message.channel.send("**Let me find out who made the most money** :nerd: *(wait a few seconds)*");
-
   const PLAYERS = CONFIG.get('players').value();
+  if (PLAYERS.length == 0){
+    message.channel.send("** :x: No registered players :x: **");
+    return;
+  }
 
   const RESULTS = await Promise.all(PLAYERS.map(async (player) => {
-    const { totalSpotBalance } = await getPlayerBalanceSpot(player.apikey, player.secretkey, null);
-    const TOTAL_FUTURES_BALANCE = await getPlayerBalanceFutures(player.apikey, player.secretkey);
-    const TOTAL_BALANCE = totalSpotBalance + TOTAL_FUTURES_BALANCE;
+    if (player.apikey == undefined || player.secretkey == undefined){
+      message.channel.send("** :x: No registered player :x: **");
+      return;
+    }
+
+    try {
+      const { totalSpotBalance } = await getPlayerBalanceSpot(player.apikey, player.secretkey, null);
+      const TOTAL_FUTURES_BALANCE = await getPlayerBalanceFutures(player.apikey, player.secretkey);
+    } catch (error) {
+      message.channel.send("**:warning: Error balance for " + player.name + ", are the API keys valid? :warning:**");
+      return;
+    }
+    
+    const TOTAL_BALANCE = totalSpotBalance + TOTAL_FUTURES_BALANCE;    
 
     return {
       name: player.name,
@@ -138,6 +151,12 @@ async function _handlePlayersBalance(message) {
       pnl: Math.round(TOTAL_BALANCE - player.bet),
     };
   }));
+
+  if(RESULTS[0] == undefined){
+    return;
+  }
+
+  message.channel.send("**Let me find out who made the most money** :nerd: *(wait a few seconds)*");
 
   RESULTS.sort((a, b) => b.pnl - a.pnl).forEach((result) => {
     if (result.pnl > 0) {

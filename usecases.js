@@ -2,7 +2,7 @@ const BINANCE_API = require('node-binance-api');
 const DATE = require('date-and-time');
 const { getUSDPriceByCrypto } = require('./utils');
 
-function addPlayerInConfig({ playerName, apiKey, secretKey }, config) {
+function addPlayerInConfig(playerName, apiKey, secretKey, playerBet, config) {
   if (config.get('players').find({ name: playerName }).value() == null) {
     config.get('players').push({ name: playerName, apikey: apiKey, secretkey: secretKey, bet: playerBet }).write()
     return true;
@@ -20,8 +20,9 @@ function setBetInConfig(playerName, bet, config) {
     return { message: "**:warning: Player name unknown :warning:**" };
   }
 
-  if (!isNaN(bet)) {
-    return { message: "**:warning: You must use an integer :warning:**" };
+  if (isNaN(bet)) {
+    console.log(bet);
+    return { message: "**:warning: You must use an number :warning:**" };
   }
 
   const OLD_BET = PLAYER.bet;
@@ -36,11 +37,17 @@ async function getPlayerBalanceSpot(apiKey, secretKey, message) {
     APIKEY: apiKey,
     APISECRET: secretKey
   });
+
   await BINANCE.useServerTime();
 
-  const RESULTS = await Promise.all([BINANCE.prices(), BINANCE.balance()]);
+  try {
+    const RESULTS = await Promise.all([BINANCE.prices(), BINANCE.balance()]);
+  }catch(e){
+    return;
+  }
   const PRICE = RESULTS[0];
   const CRYPTO_LIST = RESULTS[1];
+
 
   return _getBalance(CRYPTO_LIST, PRICE, message);
 }
@@ -50,6 +57,9 @@ async function getPlayerBalanceFutures(apiKey, secretKey) {
     APIKEY: apiKey,
     APISECRET: secretKey
   });
+  if (apiKey == undefined || secretKey == undefined){
+    return { totalSpotBalance: 0, message: `RIP`};
+  }
   await BINANCE.useServerTime();
 
   const FUTURES = await BINANCE.futuresAccount();
