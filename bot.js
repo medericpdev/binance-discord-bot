@@ -23,7 +23,7 @@ if (AUTO_SAVE) {
 }
 
 client.once('ready', () => {
-  console.log('Bot Binance ready !');
+  console.log('Bot Binance is now online !');
 });
 
 client.on('message', async (message) => {
