@@ -25,7 +25,7 @@ async function handleCommands(message, prefix, client) {
       "**John XX XX 100**");
   }
 
-  if (message.content.search(`${prefix}deleteplayer`) == 0)
+  if (message.content.search(`${prefix}delete`) == 0)
     _handleDeletePlayer(message, prefix);
 
   if (message.content.search(`${prefix}setbet`) == 0)
@@ -62,7 +62,7 @@ function _handleAddPlayer(message) {
 }
 
 function _handleDeletePlayer(message, prefix) {
-  const ARGS = message.content.replace(`${prefix}deleteplayer `, '');
+  const ARGS = message.content.replace(`${prefix}delete `, '');
   const ARG = ARGS.split(' ');
   const PLAYER_NAME = ARG[0].charAt(0).toUpperCase() + ARG[0].substring(1).toLowerCase();
 
