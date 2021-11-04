@@ -1,9 +1,8 @@
 function getUSDPriceByCrypto(crypto, available, onOrder, price) {
   let usd;
-  if (crypto === "BUSD" || crypto === "USDT" || crypto === "USDC")
+  if (crypto === 'BUSD' || crypto === 'USDT' || crypto === 'USDC')
     usd = available + onOrder;
-  else if (crypto === "EUR")
-    usd = (available + onOrder) * price['EURUSDT'];
+  else if (crypto === 'EUR') usd = (available + onOrder) * price['EURUSDT'];
   else {
     usd = (available + onOrder) * price[crypto + 'USDT'];
 
