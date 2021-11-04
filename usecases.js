@@ -52,13 +52,13 @@ async function getPlayerBalanceSpot(apiKey, secretKey, message) {
 
   try {
     const RESULTS = await Promise.all([BINANCE.prices(), BINANCE.balance()]);
-  } catch (e) {
-    return;
-  }
-  const PRICE = RESULTS[0];
-  const CRYPTO_LIST = RESULTS[1];
+    const PRICE = RESULTS[0];
+    const CRYPTO_LIST = RESULTS[1];
 
-  return _getBalance(CRYPTO_LIST, PRICE, message);
+    return _getBalance(CRYPTO_LIST, PRICE, message);
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 async function getPlayerBalanceFutures(apiKey, secretKey) {
@@ -66,7 +66,7 @@ async function getPlayerBalanceFutures(apiKey, secretKey) {
     APIKEY: apiKey,
     APISECRET: secretKey,
   });
-  if (apiKey == undefined || secretKey == undefined) {
+  if (apiKey === undefined || secretKey === undefined) {
     return { totalSpotBalance: 0, message: `RIP` };
   }
   await BINANCE.useServerTime();

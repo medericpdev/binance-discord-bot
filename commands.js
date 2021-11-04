@@ -213,26 +213,25 @@ async function _handlePlayersBalance(message) {
           player.apikey,
           player.secretkey
         );
+
+        const TOTAL_BALANCE = totalSpotBalance + TOTAL_FUTURES_BALANCE;
+
+        return {
+          name: player.name,
+          balance: Math.round(TOTAL_BALANCE),
+          pnl: Math.round(TOTAL_BALANCE - player.bet),
+        };
       } catch (error) {
         message.channel.send(
           '**:warning: Error balance for ' +
             player.name +
             ', are the API keys valid? :warning:**'
         );
-        return;
       }
-
-      const TOTAL_BALANCE = totalSpotBalance + TOTAL_FUTURES_BALANCE;
-
-      return {
-        name: player.name,
-        balance: Math.round(TOTAL_BALANCE),
-        pnl: Math.round(TOTAL_BALANCE - player.bet),
-      };
     })
   );
 
-  if (RESULTS[0] == undefined) {
+  if (RESULTS[0] === undefined) {
     return;
   }
 
