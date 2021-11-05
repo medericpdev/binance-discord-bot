@@ -168,22 +168,20 @@ function getPnlHistory(message, playerName, pnl, db) {
   }
 }
 
-async function saveData(config, db) {
-  const PLAYERS = config.get('players').value();
-
-  for (const PLAYER of PLAYERS) {
+async function saveData(players, db) {
+  for (const player of players) {
     const { totalSpotBalance } = await getPlayerBalanceSpot(
-      PLAYER.apikey,
-      PLAYER.secretkey,
+      player.apiKey,
+      player.secretKey,
       null
     );
     const TOTAL_FUTURES_BALANCE = await getPlayerBalanceFutures(
-      PLAYER.apikey,
-      PLAYER.secretkey
+      player.apiKey,
+      player.secretKey
     );
 
     let balanceTotal = TOTAL_FUTURES_BALANCE + totalSpotBalance;
-    const PNL = Math.round(balanceTotal - PLAYER.bet);
+    const PNL = Math.round(balanceTotal - player.bet);
     const NOW = new Date();
     const YEAR = NOW.getFullYear();
     const MONTH = NOW.getMonth() + 1;
@@ -194,12 +192,12 @@ async function saveData(config, db) {
     if (
       db
         .get('data')
-        .find({ player_name: PLAYER.name, year: YEAR, month: MONTH, day: DAY })
+        .find({ player_name: player.name, year: YEAR, month: MONTH, day: DAY })
         .value() == null
     )
       db.get('data')
         .push({
-          player_name: PLAYER.name,
+          player_name: player.name,
           balance: balanceTotal,
           year: YEAR,
           month: MONTH,
@@ -210,7 +208,7 @@ async function saveData(config, db) {
 
     console.log(
       'Saving ' +
-        PLAYER.name +
+        player.name +
         "'s data (" +
         DAY +
         '/' +

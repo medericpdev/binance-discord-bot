@@ -11,14 +11,13 @@ const ADAPTER_DB = new FileSync('db.json');
 const DB = low(ADAPTER_DB);
 DB.defaults({ data: [] }).write();
 
-const ADAPTER_CONFIG = new FileSync('config.json');
-const CONFIG = low(ADAPTER_CONFIG);
+const configRepository = require('./repository/config-repository');
+const config = configRepository.getConfig();
 
-const AUTO_SAVE = CONFIG.get('auto_save').value();
-
-if (AUTO_SAVE) {
+if (config.autoSave) {
   cron.schedule('* * */5 * *', async () => {
-    await saveData(CONFIG, DB);
+    const config = configRepository.getConfig();
+    await saveData(config.players, DB);
   });
 }
 
@@ -27,8 +26,7 @@ client.once('ready', () => {
 });
 
 client.on('message', async (message) => {
-  const PREFIX = CONFIG.get('prefix').value();
-  await handleCommands(message, PREFIX, client);
+  await handleCommands(message, config.prefix, client);
 });
 
-client.login(CONFIG.get('token').value());
+client.login(config.token);
