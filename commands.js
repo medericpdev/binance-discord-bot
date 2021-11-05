@@ -17,6 +17,9 @@ DB.defaults({ data: [] }).write();
 const ADAPTER_CONFIG = new FILE_SYNC('config.json');
 const CONFIG = LOW(ADAPTER_CONFIG);
 
+const configRepository = require('./repository/config-repository');
+const config = configRepository.getConfig();
+
 async function handleCommands(message, prefix, client) {
   if (message.channel.type === 'dm' && message.author.bot == false) {
     _handleAddPlayer(message);
@@ -24,7 +27,7 @@ async function handleCommands(message, prefix, client) {
   }
 
   message.channel = client.channels.cache.find(
-    (channel) => channel.name === CONFIG.get('channel_name').value()
+    (channel) => channel.name === config.channelName
   );
 
   if (message.content.search(`${prefix}addplayer`) == 0) {
@@ -102,7 +105,7 @@ function _handleDeletePlayer(message, prefix) {
   const PLAYER_NAME =
     ARG[0].charAt(0).toUpperCase() + ARG[0].substring(1).toLowerCase();
 
-  if (CONFIG.get('players').find({ name: PLAYER_NAME }).value() == null) {
+  if (!config.players.find((player) => player.name === PLAYER_NAME)) {
     message.channel.send('**:warning: Player name unknown :warning:**');
     return;
   }
@@ -125,7 +128,7 @@ function _handleSetBet(message, prefix) {
 }
 
 async function _handlePlayerBalance(message, PLAYER_NAME) {
-  const PLAYER = CONFIG.get('players').find({ name: PLAYER_NAME }).value();
+  const PLAYER = config.players.find({ name: PLAYER_NAME }).value();
 
   if (!PLAYER) {
     message.channel.send('**:warning: Player name unknown :warning:**');
@@ -180,8 +183,7 @@ async function _handlePlayerBalance(message, PLAYER_NAME) {
           '$**'
       );
 
-    if (CONFIG.get('show_pnl_history').value())
-      getPnlHistory(message, PLAYER.name, PNL, DB);
+    if (config.showPnlHistory) getPnlHistory(message, PLAYER.name, PNL, DB);
   } catch (e) {
     message.channel.send(
       '**:warning: Error balance, are the API keys valid? :warning:**'
@@ -190,14 +192,14 @@ async function _handlePlayerBalance(message, PLAYER_NAME) {
 }
 
 async function _handlePlayersBalance(message) {
-  const PLAYERS = CONFIG.get('players').value();
-  if (PLAYERS.length == 0) {
+  const players = config.players;
+  if (players.length == 0) {
     message.channel.send('** :x: No registered players :x: **');
     return;
   }
 
   const RESULTS = await Promise.all(
-    PLAYERS.map(async (player) => {
+    players.map(async (player) => {
       if (player.apikey == undefined || player.secretkey == undefined) {
         message.channel.send('** :x: No registered player :x: **');
         return;
