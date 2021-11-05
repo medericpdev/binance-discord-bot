@@ -221,7 +221,7 @@ async function getAllPlayersBalance({ config = getConfig() } = {}) {
   );
 
   if (!results.length) {
-    return;
+    return [];
   }
 
   return results
