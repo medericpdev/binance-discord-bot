@@ -10,11 +10,11 @@ function addPlayer({
   config = getConfig(),
 } = {}) {
   const newPlayer = new Player({ name, apiKey, secretKey, bet });
-  return config.addPlayer(newPlayer);
+  return config.addPlayer({ player: newPlayer });
 }
 
 function deletePlayer({ playerName, config = getConfig() } = {}) {
-  return config.deletePlayer({ name: playerName });
+  return config.deletePlayer({ player: { name: playerName } });
 }
 
 function updatePlayerBet({ playerName, bet, config = getConfig() } = {}) {

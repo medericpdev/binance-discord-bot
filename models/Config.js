@@ -1,5 +1,3 @@
-const configRepo = require('../repository/config-repository');
-
 class Config {
   constructor({
     prefix = '!',
@@ -24,7 +22,10 @@ class Config {
     this.players = players;
   }
 
-  addPlayer(player, configRepo = configRepo) {
+  addPlayer({
+    player,
+    configRepo = require('../repository/config-repository'),
+  } = {}) {
     if (this.players.find((player) => player.name === player.name)) {
       throw new Error('Player with this name already exists');
     }
@@ -33,17 +34,23 @@ class Config {
     return savedPlayer;
   }
 
-  deletePlayer(player, configRepo = configRepo) {
+  deletePlayer({
+    player,
+    configRepo = require('../repository/config-repository'),
+  } = {}) {
     if (!this.players.find((player) => player.name === player.name)) {
       throw new Error('Player with this name does not exists');
     }
     configRepo.deletePlayer(player);
-    this.players = this.players.filter((p) => p.name !== player.name);
+    this.players = this.players.filter((player) => player.name !== player.name);
   }
 
-  updatePlayer(player, configRepo = configRepo) {
-    this.deletePlayer(player, configRepo);
-    this.addPlayer(player, configRepo);
+  updatePlayer({
+    player,
+    configRepo = require('../repository/config-repository'),
+  } = {}) {
+    this.deletePlayer({ player, configRepo });
+    this.addPlayer({ player, configRepo });
   }
 }
 

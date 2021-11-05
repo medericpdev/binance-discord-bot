@@ -26,7 +26,7 @@ describe('Unit | models | Config', () => {
       };
 
       // when
-      const result = config.addPlayer(player, configRepo);
+      const result = config.addPlayer({ player, configRepo });
 
       // then
       expect(config.players[0]).toEqual(expectedSavedUser);
@@ -49,7 +49,7 @@ describe('Unit | models | Config', () => {
 
         // then
         expect(() => {
-          config.addPlayer(player, configRepo);
+          config.addPlayer({ player, configRepo });
         }).toThrow('Player with this name already exists');
       });
     });
@@ -69,7 +69,7 @@ describe('Unit | models | Config', () => {
       };
 
       // when
-      config.deletePlayer(player, configRepo);
+      config.deletePlayer({ player, configRepo });
 
       // then
       expect(config.players.length).toEqual(0);
@@ -89,7 +89,7 @@ describe('Unit | models | Config', () => {
 
         // then
         expect(() => {
-          config.deletePlayer(player, configRepo);
+          config.deletePlayer({ player, configRepo });
         }).toThrow('Player with this name does not exists');
       });
     });
@@ -113,7 +113,7 @@ describe('Unit | models | Config', () => {
 
       // when
       const updatedPlayer = { name: 'foo', bet: 25 };
-      config.updatePlayer(updatedPlayer, configRepo);
+      config.updatePlayer({ player: updatedPlayer, configRepo });
 
       // then
       expect(config.players.length).toEqual(1);
@@ -133,7 +133,7 @@ describe('Unit | models | Config', () => {
 
         // then
         expect(() => {
-          config.updatePlayer(player, configRepo);
+          config.updatePlayer({ player, configRepo });
         }).toThrow('Player with this name does not exists');
       });
     });
