@@ -7,7 +7,8 @@
     "test": "jest",
     "start": "node bot.js",
     "lint": "eslint --ext \".js\" --ignore-path ./.gitignore .",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "config": "cp sample.config.json config.json"
   },
   "author": "MedericPENNANECH",
   "license": "ISC",

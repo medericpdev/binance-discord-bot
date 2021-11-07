@@ -11,6 +11,10 @@ Download Node.js and run this commands to download & install the required module
 ```
 npm install
 ```
+
+```
+npm run config
+```
 Modify config.json:
 * prefix : the command prefix
 * token : the token of your discord bot
