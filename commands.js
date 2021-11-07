@@ -6,17 +6,14 @@ const {
   getAllPlayersBalance,
 } = require('./usecases');
 
-const configRepository = require('./repository/config-repository');
-const config = configRepository.getConfig();
-
-async function handleCommands(message, prefix, client) {
+async function handleCommands(message, prefix, channelName, client) {
   if (message.channel.type === 'dm' && message.author.bot == false) {
     _handleAddPlayer(message);
     return;
   }
 
   message.channel = client.channels.cache.find(
-    (channel) => channel.name === config.channelName
+    (channel) => channel.name === channelName
   );
 
   if (message.content.search(`${prefix}addplayer`) == 0) {

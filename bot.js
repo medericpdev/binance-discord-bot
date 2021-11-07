@@ -19,7 +19,7 @@ client.once('ready', () => {
 });
 
 client.on('message', async (message) => {
-  await handleCommands(message, config.prefix, client);
+  await handleCommands(message, config.prefix, config.channelName, client);
 });
 
 client.login(config.token);
