@@ -70,7 +70,7 @@ function _handleAddPlayer(message) {
       .send(
         '** :white_check_mark: name : **' +
           player.name +
-          +'\n' +
+          '\n' +
           '** :white_check_mark: api_key : **' +
           player.apiKey +
           '\n' +
