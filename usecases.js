@@ -181,6 +181,10 @@ async function getPlayerBalance({ playerName, config = getConfig() } = {}) {
 }
 
 async function getAllPlayersBalance({ config = getConfig() } = {}) {
+  if (config.players.length === 0) {
+    throw new Error('No player found');
+  }
+
   const results = await Promise.all(
     config.players.map(async (player) => {
       const [futures, spot] = await Promise.all([
