@@ -4,10 +4,11 @@
   "description": "Bot discord to display your binance balance",
   "main": "bot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node bot.js",
     "lint": "eslint --ext \".js\" --ignore-path ./.gitignore .",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "config": "cp sample.config.json config.json"
   },
   "author": "MedericPENNANECH",
   "license": "ISC",
@@ -26,6 +27,7 @@
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.3.1",
     "prettier": "^2.4.1"
   }
 }
