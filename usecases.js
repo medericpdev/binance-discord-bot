@@ -1,6 +1,7 @@
 const DATE = require('date-and-time');
 const Player = require('./models/Player');
 const { getConfig } = require('./repository/config-repository');
+const { getBackupDatabase } = require('./repository/backup-repository');
 
 function addPlayer({
   name,
@@ -34,124 +35,99 @@ function updatePlayerBet({ playerName, bet, config = getConfig() } = {}) {
   }
 }
 
-function getPnlHistory(message, playerName, pnl, db) {
+function getPnlHistory({ playerName, pnl, db = getBackupDatabase() } = {}) {
   let balanceNow;
-  const NOW = new Date();
+  const now = new Date();
 
-  const YESTERDAY = DATE.addDays(NOW, -1);
-  const LAST_WEEK = DATE.addDays(NOW, -7);
-  const LAST_MONTH = DATE.addMonths(NOW, -1);
+  const yesterday = DATE.addDays(now, -1);
+  const lastWeek = DATE.addDays(now, -7);
+  const lastMonth = DATE.addMonths(now, -1);
 
-  const YESTERDAY_DATE = db
+  const yesterdayData = db
     .get('data')
     .find({
       player_name: playerName,
-      year: YESTERDAY.getFullYear(),
-      month: YESTERDAY.getMonth() + 1,
-      day: YESTERDAY.getDate(),
+      year: yesterday.getFullYear(),
+      month: yesterday.getMonth() + 1,
+      day: yesterday.getDate(),
     })
     .value();
-  const LAST_WEEK_DATA = db
+  const lastWeekData = db
     .get('data')
     .find({
       player_name: playerName,
-      year: LAST_WEEK.getFullYear(),
-      month: LAST_WEEK.getMonth() + 1,
-      day: LAST_WEEK.getDate(),
+      year: lastWeek.getFullYear(),
+      month: lastWeek.getMonth() + 1,
+      day: lastWeek.getDate(),
     })
     .value();
-  const LAST_MONTH_DATA = db
+  const lastMonthData = db
     .get('data')
     .find({
       player_name: playerName,
-      year: LAST_MONTH.getFullYear(),
-      month: LAST_MONTH.getMonth() + 1,
-      day: LAST_MONTH.getDate(),
+      year: lastMonth.getFullYear(),
+      month: lastMonth.getMonth() + 1,
+      day: lastMonth.getDate(),
     })
     .value();
 
   const MAP = new Map();
-  MAP.set('Yesterday', YESTERDAY_DATE);
-  MAP.set('Last week', LAST_WEEK_DATA);
-  MAP.set('Last Month', LAST_MONTH_DATA);
+  MAP.set('Yesterday', yesterdayData);
+  MAP.set('Last week', lastWeekData);
+  MAP.set('Last Month', lastMonthData);
 
+  let messages = [];
   for (let [key, value] of MAP) {
-    if (!value)
-      message.channel.send(
-        '**:small_orange_diamond: ' + key + ' :** *No data*'
-      );
-    else {
+    if (!value) {
+      messages.push('**:small_orange_diamond: ' + key + ' :** *No data*');
+    } else {
       balanceNow = pnl - value.pnl;
-      message.channel.send(
-        '**:small_orange_diamond: ' +
-          key +
-          '** *(' +
-          value.day +
-          '/' +
-          value.month +
-          '/' +
-          value.year +
-          ')* : **' +
-          balanceNow +
-          '$**'
+      messages.push(
+        `**:small_orange_diamond: ${key}** *(${value.day}/${value.month}/${value.year})* : **${balanceNow}$**`
       );
     }
   }
+  return messages;
 }
 
-async function saveData(players, db) {
-  for (const player of players) {
-    // TODO : Faire ça
-    const { totalSpotBalance } = await getPlayerBalanceSpot(
-      player.apiKey,
-      player.secretKey,
-      null
-    );
-    const TOTAL_FUTURES_BALANCE = await getPlayerBalanceFutures(
-      player.apiKey,
-      player.secretKey
-    );
+async function saveData({
+  config = getConfig(),
+  db = getBackupDatabase(),
+} = {}) {
+  for (const player of config.players) {
+    const [futures, spot] = await Promise.all([
+      player.getBalanceFutures(),
+      player.getBalanceSpot(),
+    ]);
 
-    let balanceTotal = TOTAL_FUTURES_BALANCE + totalSpotBalance;
+    let balanceTotal = futures + spot.total;
     const PNL = Math.round(balanceTotal - player.bet);
-    const NOW = new Date();
-    const YEAR = NOW.getFullYear();
-    const MONTH = NOW.getMonth() + 1;
-    const DAY = NOW.getDate();
-    const HOUR = NOW.getHours();
-    const MINUTE = NOW.getMinutes();
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
 
     if (
       db
         .get('data')
-        .find({ player_name: player.name, year: YEAR, month: MONTH, day: DAY })
+        .find({ player_name: player.name, year: year, month: month, day: day })
         .value() == null
     )
       db.get('data')
         .push({
           player_name: player.name,
           balance: balanceTotal,
-          year: YEAR,
-          month: MONTH,
-          day: DAY,
+          year: year,
+          month: month,
+          day: day,
           pnl: PNL,
         })
         .write();
 
     console.log(
-      'Saving ' +
-        player.name +
-        "'s data (" +
-        DAY +
-        '/' +
-        MONTH +
-        '/' +
-        YEAR +
-        ' - ' +
-        HOUR +
-        ':' +
-        MINUTE +
-        ')'
+      `Saving ${player.name}'s data (${day}/${month}/${year} - ${hour}:${minute})`
     );
   }
 }
@@ -195,8 +171,10 @@ async function getPlayerBalance({ playerName, config = getConfig() } = {}) {
   }
 
   if (config.showPnlHistory) {
-    // TODO getPnl
-    // getPnlHistory(message, player.name, pnl, DB);
+    messages = [
+      ...messages,
+      ...getPnlHistory({ playerName: player.name, pnl }),
+    ];
   }
 
   return messages;
@@ -240,6 +218,5 @@ module.exports = {
   updatePlayerBet,
   getPlayerBalance,
   getAllPlayersBalance,
-  getPnlHistory,
   saveData,
 };

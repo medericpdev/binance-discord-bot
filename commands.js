@@ -4,15 +4,7 @@ const {
   updatePlayerBet,
   getPlayerBalance,
   getAllPlayersBalance,
-  getPnlHistory,
 } = require('./usecases');
-
-const LOW = require('lowdb');
-const FILE_SYNC = require('lowdb/adapters/FileSync');
-
-const ADAPTER_DB = new FILE_SYNC('db.json');
-const DB = LOW(ADAPTER_DB);
-DB.defaults({ data: [] }).write();
 
 const configRepository = require('./repository/config-repository');
 const config = configRepository.getConfig();
