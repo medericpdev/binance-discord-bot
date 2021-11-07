@@ -123,8 +123,12 @@ async function _handlePlayerBalance(message, playerName) {
 }
 
 async function _handlePlayersBalance(message) {
-  const messages = getAllPlayersBalance();
-  messages.forEach((msg) => message.channel.send(msg));
+  try {
+    const messages = await getAllPlayersBalance();
+    messages.forEach((msg) => message.channel.send(msg));
+  } catch (e) {
+    message.channel.send(`**:warning: Error: ${e.message} :warning:**`);
+  }
 }
 
 async function _handleBalanceCommand(message, prefix) {
