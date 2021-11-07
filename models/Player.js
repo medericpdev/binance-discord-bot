@@ -1,4 +1,5 @@
 const { getUSDPriceByCrypto } = require('../utils');
+const BinanceAPI = require('node-binance-api');
 
 class Player {
   constructor({ name, apiKey, secretKey, bet }) {
@@ -33,7 +34,7 @@ class Player {
     config.updatePlayer(this);
   }
 
-  async getBalanceFutures(binanceAPI) {
+  async getBalanceFutures({ binanceAPI = new BinanceAPI() } = {}) {
     const binance = binanceAPI.options({
       APIKEY: this.apiKey,
       APISECRET: this.secretKey,
@@ -44,7 +45,7 @@ class Player {
     return isNaN(balance) ? 0 : balance;
   }
 
-  async getBalanceSpot(binanceAPI) {
+  async getBalanceSpot({ binanceAPI = new BinanceAPI() } = {}) {
     const binance = binanceAPI.options({
       APIKEY: this.apiKey,
       APISECRET: this.secretKey,
@@ -56,27 +57,32 @@ class Player {
         binance.balance(),
       ]);
       const cryptos = [];
-      const total = cryptoList.reduce((acc, crypto) => {
-        let available = parseFloat(crypto['available']);
-        let onOrder = parseFloat(crypto['onOrder']);
+      let total = 0;
+
+      for (let crypto in cryptoList) {
+        let available = parseFloat(cryptoList[crypto]['available']);
+        let onOrder = parseFloat(cryptoList[crypto]['onOrder']);
         if (available + onOrder === 0.0) {
-          return;
+          continue;
         }
 
         let amount = getUSDPriceByCrypto(crypto, available, onOrder, price);
         if (amount > 2) {
           amount = Math.round(amount);
           cryptos.push({ value: crypto, amount });
-          return acc + amount;
+          total += amount;
         }
-      }, 0);
+      }
+
       return { total, cryptos };
     } catch (e) {
       console.log(e);
     }
   }
 
-  getPnlHistory() {}
+  getPnlHistory() {
+    // TODO Move getPnlHistory in Player
+  }
 }
 
 module.exports = Player;
