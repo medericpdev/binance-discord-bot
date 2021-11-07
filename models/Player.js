@@ -22,7 +22,7 @@ class Player {
     this.name = name;
     this.apiKey = apiKey;
     this.secretKey = secretKey;
-    this.bet = bet;
+    this.bet = parseInt(bet);
   }
 
   setBet(bet, config) {
@@ -30,7 +30,7 @@ class Player {
       throw new Error('bet must be a number');
     }
 
-    this.bet = bet;
+    this.bet = parseInt(bet);
     config.updatePlayer(this);
   }
 

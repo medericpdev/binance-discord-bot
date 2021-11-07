@@ -105,10 +105,14 @@ function _handleDeletePlayer(message, prefix) {
 function _handleSetBet(message, prefix) {
   const data = _extractDataFromCommand(message, prefix, 'setbet');
   const playerName = _normalizeName(data[0]);
-  const bet = parseInt(data[1]);
-  const { message: messageToSend } = updatePlayerBet({ playerName, bet });
+  const bet = data[1];
 
-  message.channel.send(messageToSend);
+  try {
+    const { message: messageToSend } = updatePlayerBet({ playerName, bet });
+    message.channel.send(messageToSend);
+  } catch (e) {
+    message.channel.send(`**:warning: Error: ${e.message} :warning:**`);
+  }
 }
 
 async function _handlePlayerBalance(message, playerName) {
