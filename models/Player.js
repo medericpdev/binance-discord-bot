@@ -31,7 +31,7 @@ class Player {
     }
 
     this.bet = parseInt(bet);
-    config.updatePlayer(this);
+    config.updatePlayer({ player: this });
   }
 
   async getBalanceFutures({ binanceAPI = new BinanceAPI() } = {}) {
