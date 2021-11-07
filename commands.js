@@ -50,7 +50,7 @@ function _handleAddPlayer(message) {
   const name = _normalizeName(arg[0]);
   const apiKey = arg[1];
   const secretKey = arg[2];
-  const bet = parseInt(arg[3]);
+  const bet = arg[3];
 
   if (arg[0] == null || arg[1] == null || (arg[2] == null) | (arg[3] == null)) {
     message.author
@@ -68,17 +68,17 @@ function _handleAddPlayer(message) {
     const player = addPlayer({ name, apiKey, secretKey, bet });
     message.author
       .send(
-        ':white_check_mark: name : **' +
-          +'**\n' +
-          ':white_check_mark: api_key : **' +
+        '** :white_check_mark: name : **' +
           player.name +
-          '**\n' +
-          ':white_check_mark: secret_key : **' +
+          +'\n' +
+          '** :white_check_mark: api_key : **' +
+          player.apiKey +
+          '\n' +
+          '** :white_check_mark: secret_key : **' +
           player.secretKey +
-          '**\n' +
-          ':white_check_mark: bet : **' +
-          player.bet +
-          '**'
+          '\n' +
+          '** :white_check_mark: bet : **' +
+          player.bet
       )
       .catch((err) => {});
   } catch (e) {
