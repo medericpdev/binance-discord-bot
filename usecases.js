@@ -133,7 +133,7 @@ async function saveData({
 }
 
 async function getPlayerBalance({ playerName, config = getConfig() } = {}) {
-  const player = config.players.find((player) => player.name === playerName);
+  const player = config.findPlayer({ name: playerName });
   if (!player) {
     return ['**:warning: Player name unknown :warning:**'];
   }

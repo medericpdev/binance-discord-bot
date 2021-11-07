@@ -26,7 +26,7 @@ class Config {
     player,
     configRepo = require('../repository/config-repository'),
   } = {}) {
-    if (this.players.find((player) => player.name === player.name)) {
+    if (this.findPlayer(player)) {
       throw new Error('Player with this name already exists');
     }
     const savedPlayer = configRepo.savePlayer(player);
@@ -38,7 +38,7 @@ class Config {
     player,
     configRepo = require('../repository/config-repository'),
   } = {}) {
-    if (!this.players.find((player) => player.name === player.name)) {
+    if (!this.findPlayer(player)) {
       throw new Error('Player with this name does not exists');
     }
     configRepo.deletePlayer(player);
@@ -51,6 +51,10 @@ class Config {
   } = {}) {
     this.deletePlayer({ player, configRepo });
     this.addPlayer({ player, configRepo });
+  }
+
+  findPlayer(player) {
+    return this.players.find((p) => p.name === player.name);
   }
 }
 

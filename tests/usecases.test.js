@@ -1,4 +1,5 @@
 const usecases = require('../usecases');
+const Config = require('../models/Config');
 const Player = require('../models/Player');
 
 describe('Unit | domain | use-cases', () => {
@@ -128,9 +129,12 @@ describe('Unit | domain | use-cases', () => {
         }),
         bet: 50,
       };
-      const config = {
+      const config = new Config({
         players: [player],
-      };
+        token: 'token',
+        channelName: 'test',
+        showPnlHistory: false,
+      });
 
       // when
       const result = await usecases.getPlayerBalance({ playerName, config });
@@ -148,9 +152,12 @@ describe('Unit | domain | use-cases', () => {
       it('should return error message', async () => {
         // given
         const playerName = 'foo';
-        const config = {
+        const config = new Config({
           players: [],
-        };
+          token: 'token',
+          channelName: 'test',
+          showPnlHistory: false,
+        });
 
         // when
         const result = await usecases.getPlayerBalance({ playerName, config });
@@ -173,9 +180,12 @@ describe('Unit | domain | use-cases', () => {
           }),
           bet: 50,
         };
-        const config = {
+        const config = new Config({
           players: [player],
-        };
+          token: 'token',
+          channelName: 'test',
+          showPnlHistory: false,
+        });
 
         // when
         const result = await usecases.getPlayerBalance({ playerName, config });
@@ -201,9 +211,12 @@ describe('Unit | domain | use-cases', () => {
           }),
           bet: 50,
         };
-        const config = {
+        const config = new Config({
           players: [player],
-        };
+          token: 'token',
+          channelName: 'test',
+          showPnlHistory: false,
+        });
 
         // when
         const result = await usecases.getPlayerBalance({ playerName, config });
@@ -230,9 +243,12 @@ describe('Unit | domain | use-cases', () => {
           }),
           bet: 50,
         };
-        const config = {
+        const config = new Config({
           players: [player],
-        };
+          token: 'token',
+          channelName: 'test',
+          showPnlHistory: false,
+        });
 
         // when
         const result = await usecases.getPlayerBalance({ playerName, config });
@@ -260,9 +276,12 @@ describe('Unit | domain | use-cases', () => {
           }),
           bet: 50,
         };
-        const config = {
+        const config = new Config({
           players: [player],
-        };
+          token: 'token',
+          channelName: 'test',
+          showPnlHistory: false,
+        });
 
         // when
         const result = await usecases.getPlayerBalance({ playerName, config });
