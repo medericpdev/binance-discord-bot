@@ -46,11 +46,19 @@ async function handleCommands(message, prefix, client) {
     await _handleBalanceCommand(message, prefix);
 }
 
+function _extractDataFromCommand(message, prefix, command) {
+  const args = message.content.replace(`${prefix}${command} `, '');
+  return args.split(' ');
+}
+
+function _normalizeName(name) {
+  return name.charAt(0).toUpperCase() + name.substring(1).toLowerCase();
+}
+
 function _handleAddPlayer(message) {
   const args = message.content;
   const arg = args.split(' ');
-  const name =
-    arg[0].charAt(0).toUpperCase() + arg[0].substring(1).toLowerCase();
+  const name = _normalizeName(arg[0]);
   const apiKey = arg[1];
   const secretKey = arg[2];
   const bet = parseInt(arg[3]);
@@ -92,10 +100,8 @@ function _handleAddPlayer(message) {
 }
 
 function _handleDeletePlayer(message, prefix) {
-  const args = message.content.replace(`${prefix}delete `, '');
-  const arg = args.split(' ');
-  const playerName =
-    arg[0].charAt(0).toUpperCase() + arg[0].substring(1).toLowerCase();
+  const data = _extractDataFromCommand(message, prefix, 'delete');
+  const playerName = _normalizeName(data[0]);
 
   try {
     deletePlayer({ playerName });
@@ -108,11 +114,9 @@ function _handleDeletePlayer(message, prefix) {
 }
 
 function _handleSetBet(message, prefix) {
-  const args = message.content.replace(`${prefix}setbet `, '');
-  const arg = args.split(' ');
-  const playerName =
-    arg[0].charAt(0).toUpperCase() + arg[0].substring(1).toLowerCase();
-  const bet = parseInt(arg[1]);
+  const data = _extractDataFromCommand(message, prefix, 'setbet');
+  const playerName = _normalizeName(data[0]);
+  const bet = parseInt(data[1]);
   const { message: messageToSend } = updatePlayerBet({ playerName, bet });
 
   message.channel.send(messageToSend);
@@ -135,11 +139,10 @@ async function _handlePlayersBalance(message) {
 }
 
 async function _handleBalanceCommand(message, prefix) {
-  const ARG = message.content.replace(`${prefix}balance `, '');
-  const PLAYER_NAME =
-    ARG.charAt(0).toUpperCase() + ARG.substring(1).toLowerCase();
+  const data = _extractDataFromCommand(message, prefix, 'balance');
+  const playerName = _normalizeName(data[0]);
 
-  if (ARG !== 'all') await _handlePlayerBalance(message, PLAYER_NAME);
+  if (data[0] !== 'all') await _handlePlayerBalance(message, playerName);
   else await _handlePlayersBalance(message);
 }
 
