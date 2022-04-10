@@ -1,7 +1,7 @@
 # bot-discord-binance
 
 * Display your Binance balance (spot & futures) on your Discord server
-* Check if you are winning or losing your money
+* Check if you are winning or losing money
 * Compare your Binance balance with your friends
 * Compare your current balance to your previous balance (yesterday, last week, last month)
 
@@ -12,9 +12,6 @@ Download Node.js and run this commands to download & install the required module
 npm install
 ```
 
-```
-npm run config
-```
 Modify config.json:
 * prefix : the command prefix
 * token : the token of your discord bot
