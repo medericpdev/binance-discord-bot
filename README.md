@@ -39,6 +39,8 @@ Note : Your bot needs permission to write in config.json and db.json files
 
 # Commands
 
+Note : The following commands must be submitted in the channel you specified in the config.json file
+
 Add a player :
 ```
 !addplayer
