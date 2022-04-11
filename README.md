@@ -15,7 +15,7 @@ npm install
 Modify config.json:
 * prefix : the command prefix
 * token : the token of your discord bot
-* auto_save : if you want save or not the players' balance each day in db.json
+* auto_save : if you want to save or not the players' balance every day (at midnight) in db.json
 * show_pnl_history : if you want to display the profit and loss of players
 * channel_name : the discord channel name where the bot will write
 * players : don't touch, this is where the players information will registered
