@@ -9,7 +9,8 @@ const configRepository = require('./repository/config-repository');
 const config = configRepository.getConfig();
 
 if (config.autoSave) {
-  cron.schedule('* * */5 * *', async () => {
+  //save each day at midnight
+  cron.schedule('0 0 0 * * *', async () => {
     await saveData();
   });
 }
